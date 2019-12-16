@@ -1,11 +1,11 @@
 process.env.NODE_ENV = "test";
 const app = require("../app");
-// const request = require
-// const chai require
-// const { expect } = require
-// const chaiSorted = require("chai-sorted")
-// const knexion = require()
-// chai.use(chaiSorted);
+const request = require("supertest")(app);
+const chai = require("chai");
+const { expect } = chai;
+const chaiSorted = require("chai-sorted");
+const knexion = require("../db/data/connection");
+chai.use(chaiSorted);
 
 after(() => {
   return knexion.destroy();
@@ -19,6 +19,7 @@ describe("/api", () => {
           .get("/api/topics")
           .expect(200)
           .then(response => {
+            console.log("got response");
             expect(response.body.topics).to.deep.equal([
               {
                 description: "The man, the Mitch, the legend",
