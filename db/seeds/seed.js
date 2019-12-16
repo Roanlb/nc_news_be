@@ -7,22 +7,22 @@ const {
 
 const { formatDates, formatComments, makeRefObj } = require("../utils/utils");
 
-// exports.rollbackThenSeed = function(knex) {knex.migrate.rollback().then() => return knex.migrate.latest();}
-
 exports.seed = function(knex) {
-  const topicsInsertions = knex("topics").insert(topicData);
-  const usersInsertions = knex("users").insert(userData);
-  const articleInsertions = knex("articles").insert(articleData);
-  const commentInsertions = knex("comments").insert(commentData);
-
-  return Promise.all([
-    topicsInsertions,
-    usersInsertions,
-    articleInsertions,
-    commentInsertions
-  ])
+  return knex.migrate
+    .rollback()
+    .then(() => knex.migrate.latest())
     .then(() => {
-      /* 
+      const topicsInsertions = knex("topics").insert(topicData);
+      const usersInsertions = knex("users").insert(userData);
+
+      return Promise.all([topicsInsertions, usersInsertions])
+        .then(() => {
+          const formattedArticles = formatDates(articleData);
+          return knex
+            .insert(formattedArticles)
+            .into("articles")
+            .returning("*");
+          /* 
       
       Your article data is currently in the incorrect format and will violate your SQL schema. 
       
@@ -30,9 +30,15 @@ exports.seed = function(knex) {
 
       Your comment insertions will depend on information from the seeded articles, so make sure to return the data after it's been seeded.
       */
-    })
-    .then(articleRows => {
-      /* 
+        })
+        .then(articleRows => {
+          let refObj = makeRefObj(articleRows, "title", "article_id");
+          let formattedComments = formatComments(commentData, refObj);
+          return knex
+            .insert(formattedComments)
+            .into("comments")
+            .returning("*");
+          /* 
 
       Your comment data is currently in the incorrect format and will violate your SQL schema. 
 
@@ -40,9 +46,6 @@ exports.seed = function(knex) {
       
       You will need to write and test the provided makeRefObj and formatComments utility functions to be able insert your comment data.
       */
-
-      const articleRef = makeRefObj(articleRows);
-      const formattedComments = formatComments(commentData, articleRef);
-      return knex("comments").insert(formattedComments);
+        });
     });
 };

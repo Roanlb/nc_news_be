@@ -1,10 +1,19 @@
 exports.formatDates = list => {
-  let listCopy = [...list];
+  let listCopy = [];
+
+  for (let i = 0; i < list.length; i++) {
+    let obj = list[i];
+    let copyObj = { ...obj };
+    listCopy.push(copyObj);
+  }
 
   listCopy = listCopy.map(item => {
     const formattedDate = new Date(item.created_at);
     item.created_at = formattedDate;
+    return item;
   });
+
+  return listCopy;
 };
 
 exports.makeRefObj = (list, key, value) => {

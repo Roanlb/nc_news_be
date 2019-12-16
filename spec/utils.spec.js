@@ -8,8 +8,7 @@ const {
 describe("formatDates", () => {
   it("when given an array of one object, returns an identical array except for the timestamp property converted to psql", () => {
     const list = [{ created_at: 1466622625 }];
-    formatDates(list);
-    expect(list[0].created_at instanceof Date).to.equal(true);
+    expect(formatDates(list)[0].created_at instanceof Date).to.equal(true);
   });
   it("takes an array of objects with timestamp properties and converts the timestamp to a psql timestamp", () => {
     const time1 = Date.now();
@@ -22,9 +21,25 @@ describe("formatDates", () => {
       { created_at: time3 }
     ];
 
-    formatDates(timeArticles);
-    for (let i = 0; i < timeArticles.length; i++) {
-      expect(timeArticles[i].created_at instanceof Date).to.equal(true);
+    const newTimes = formatDates(timeArticles);
+    for (let i = 0; i < newTimes.length; i++) {
+      expect(newTimes[i].created_at instanceof Date).to.equal(true);
+    }
+  });
+  it("does not mutate original", () => {
+    const time1 = Date.now();
+    const time2 = Date.now();
+    const time3 = Date.now();
+
+    const timeArticles = [
+      { created_at: time1 },
+      { created_at: time2 },
+      { created_at: time3 }
+    ];
+
+    const newTimes = formatDates(timeArticles);
+    for (let i = 0; i < newTimes.length; i++) {
+      expect(timeArticles[i].created_at instanceof Date).to.equal(false);
     }
   });
 });
