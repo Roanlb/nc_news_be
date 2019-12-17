@@ -7,11 +7,21 @@ const chaiSorted = require("chai-sorted");
 const knexion = require("../db/data/connection");
 chai.use(chaiSorted);
 
-after(() => {
-  return knexion.destroy();
-});
-
 describe("/api", () => {
+  after(() => {
+    return knexion.destroy();
+  });
+  beforeEach(() => {
+    return knexion.seed.run();
+  });
+  it("returns 404 not found when given a non-existent path", () => {
+    return request
+      .get("/api/topisc")
+      .expect(404)
+      .then(response => {
+        expect(response.body.msg).to.equal("Not found");
+      });
+  });
   describe("/topics", () => {
     describe("GET", () => {
       it("returns an array with each topic object", () => {
@@ -19,7 +29,6 @@ describe("/api", () => {
           .get("/api/topics")
           .expect(200)
           .then(response => {
-            console.log("got response");
             expect(response.body.topics).to.deep.equal([
               {
                 description: "The man, the Mitch, the legend",
@@ -35,6 +44,18 @@ describe("/api", () => {
               }
             ]);
           });
+      });
+    });
+    describe("invalid methods", () => {
+      it("returns error 405 with message method not allowed", () => {
+        const invalidMethods = ["patch", "put", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request[method]("/api/topics")
+            .expect(405)
+            .then(response => {
+              expect(response.body.msg).to.equal("Method not allowed");
+            });
+        });
       });
     });
   });

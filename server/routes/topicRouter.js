@@ -1,8 +1,9 @@
 const topicRouter = require("express").Router();
-const { getAllTopics } = require("../controllers/controllers");
+const { getAllTopics, send405Error } = require("../controllers/controllers");
 
-console.log(getAllTopics, "<exported and received topic controller");
-
-topicRouter.get("/", getAllTopics);
+topicRouter
+  .route("/")
+  .get(getAllTopics)
+  .all(send405Error);
 
 module.exports = topicRouter;

@@ -12,17 +12,26 @@ exports.seed = function(knex) {
     .rollback()
     .then(() => knex.migrate.latest())
     .then(() => {
-      const topicsInsertions = knex("topics").insert(topicData);
-      const usersInsertions = knex("users").insert(userData);
+      const topicsInsertions = knex("topics")
+        .insert(topicData)
+        .returning("*");
+      const usersInsertions = knex("users")
+        .insert(userData)
+        .returning("*");
 
-      return Promise.all([topicsInsertions, usersInsertions])
-        .then(() => {
-          const formattedArticles = formatDates(articleData);
-          return knex
-            .insert(formattedArticles)
-            .into("articles")
-            .returning("*");
-          /* 
+      return Promise.all([topicsInsertions, usersInsertions]);
+    })
+    .then(([topicsRows, userRows]) => {
+      console.log(
+        `inserted ${topicsRows.length} topics`,
+        `inserted ${userRows.length} users`
+      );
+      const formattedArticles = formatDates(articleData);
+      return knex
+        .insert(formattedArticles)
+        .into("articles")
+        .returning("*");
+      /* 
       
       Your article data is currently in the incorrect format and will violate your SQL schema. 
       
@@ -30,15 +39,16 @@ exports.seed = function(knex) {
 
       Your comment insertions will depend on information from the seeded articles, so make sure to return the data after it's been seeded.
       */
-        })
-        .then(articleRows => {
-          let refObj = makeRefObj(articleRows, "title", "article_id");
-          let formattedComments = formatComments(commentData, refObj);
-          return knex
-            .insert(formattedComments)
-            .into("comments")
-            .returning("*");
-          /* 
+    })
+    .then(articleRows => {
+      console.log(`inserted ${articleRows.length} articles`);
+      let refObj = makeRefObj(articleRows, "title", "article_id");
+      let formattedComments = formatComments(commentData, refObj);
+      return knex
+        .insert(formattedComments)
+        .into("comments")
+        .returning("*");
+      /* 
 
       Your comment data is currently in the incorrect format and will violate your SQL schema. 
 
@@ -46,6 +56,6 @@ exports.seed = function(knex) {
       
       You will need to write and test the provided makeRefObj and formatComments utility functions to be able insert your comment data.
       */
-        });
-    });
+    })
+    .catch(console.log);
 };

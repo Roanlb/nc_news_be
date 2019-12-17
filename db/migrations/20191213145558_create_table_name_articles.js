@@ -6,10 +6,10 @@ exports.up = function(knex) {
     articleTable.integer("votes").defaultTo(0);
     articleTable.string("topic").references("topics.slug");
     articleTable.string("author").references("users.username");
-    articleTable.string("created_at").defaultTo(Date.now());
+    articleTable.timestamp("created_at").defaultTo(knex.fn.now());
   });
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable("articles");
+  return knex.schema.dropTableIfExists("articles");
 };
