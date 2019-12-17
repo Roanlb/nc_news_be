@@ -1,4 +1,4 @@
-const fetchAllTopics = require("../models/models");
+const { fetchAllTopics, fetchUser } = require("../models/models");
 
 function getAllTopics(req, res, next) {
   fetchAllTopics()
@@ -12,6 +12,13 @@ function send405Error(req, res, next) {
   res.status(405).send({ msg: "Method not allowed" });
 }
 
-module.exports = { getAllTopics, send405Error };
+function getUser(req, res, next) {
+  const { username } = req.params;
+  fetchUser(username)
+    .then(response => {
+      res.status(200).send({ user: response[0] });
+    })
+    .catch(next);
+}
 
-//console log of fetchalltopics shows up but doesnt activate and show in topics controller
+module.exports = { getAllTopics, send405Error, getUser };

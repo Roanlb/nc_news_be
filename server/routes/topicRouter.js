@@ -6,4 +6,4 @@ topicRouter
   .get(getAllTopics)
   .all(send405Error);
 
-module.exports = topicRouter;
+module.exports = { topicRouter };
