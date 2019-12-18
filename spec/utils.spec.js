@@ -71,6 +71,47 @@ describe("makeRefObj", () => {
       "Eight pug gifs that remind me of mitch": 2
     });
   });
+  it("does not mutate original array", () => {
+    const articles = [
+      {
+        article_id: 1,
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      },
+      {
+        article_id: 2,
+        title: "Eight pug gifs that remind me of mitch",
+        topic: "mitch",
+        author: "icellusedkars",
+        body: "some gifs",
+        created_at: 1289996514171
+      }
+    ];
+    makeRefObj(articles, "title", "article_id");
+    expect(articles).to.deep.equal([
+      {
+        article_id: 1,
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      },
+      {
+        article_id: 2,
+        title: "Eight pug gifs that remind me of mitch",
+        topic: "mitch",
+        author: "icellusedkars",
+        body: "some gifs",
+        created_at: 1289996514171
+      }
+    ]);
+  });
 });
 
 describe("formatComments", () => {
@@ -132,6 +173,69 @@ describe("formatComments", () => {
         author: "butter_bridge",
         votes: 16,
         created_at: new Date(1511354163389)
+      }
+    ]);
+  });
+  it("does not mutate original array", () => {
+    const articles = [
+      {
+        article_id: 1,
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      },
+      {
+        article_id: 2,
+        title: "Eight pug gifs that remind me of mitch",
+        topic: "mitch",
+        author: "icellusedkars",
+        body: "some gifs",
+        created_at: 1289996514171
+      }
+    ];
+
+    const comments = [
+      {
+        body:
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
+        votes: 14,
+        created_at: 1479818163389
+      },
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "Eight pug gifs that remind me of mitch",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
+
+    const articleRef = makeRefObj(articles, "title", "article_id");
+
+    formatComments(comments, articleRef);
+
+    expect(comments).to.deep.equal([
+      {
+        body:
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
+        votes: 14,
+        created_at: 1479818163389
+      },
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "Eight pug gifs that remind me of mitch",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
       }
     ]);
   });

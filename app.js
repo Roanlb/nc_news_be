@@ -9,7 +9,7 @@ app.use((err, req, res, next) => {
   console.log("activated error handler", err);
   if (err.status === 404 && err.msg === "User does not exist") {
     res.status(404).send({ msg: err.msg });
-  } else if (err.code === "22P02") res.status(400).send({ msg: "Invalid ___" });
+  } else if (err.code === "22P02") res.status(400).send({ msg: "Invalid id" });
   else res.status(404).send({ msg: "Not found" });
 });
 

@@ -31,4 +31,14 @@ function getArticle(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getAllTopics, send405Error, getUser, getArticle };
+function patchArticle(req, res, next) {
+  console.log(req);
+}
+
+module.exports = {
+  getAllTopics,
+  send405Error,
+  getUser,
+  getArticle,
+  patchArticle
+};
