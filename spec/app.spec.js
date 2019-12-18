@@ -183,7 +183,10 @@ describe("/api", () => {
               .send({ username: "rogersop", body: "noishe" })
               .expect(201)
               .then(response => {
-                expect(response.body.comment[0]).to.deep.equal({comment_id: 19, author: 'rogersop', article_id: 1, votes: 0, created_at: 2019-12-18T15:44:34.633Z, body: 'noishe'});
+                expect(response.body.comment[0].votes).to.equal(0);
+                expect(response.body.comment[0].author).to.equal("rogersop");
+                expect(response.body.comment[0].article_id).to.equal(1);
+                expect(response.body.comment[0].body).to.equal("noishe");
               });
           });
         });
