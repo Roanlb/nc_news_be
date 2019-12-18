@@ -1,4 +1,10 @@
-const { fetchAllTopics, fetchUser, fetchArticle } = require("../models/models");
+const {
+  fetchAllTopics,
+  fetchUser,
+  fetchArticle,
+  amendArticle,
+  prepostArticle
+} = require("../models/models");
 
 function getAllTopics(req, res, next) {
   fetchAllTopics()
@@ -32,7 +38,21 @@ function getArticle(req, res, next) {
 }
 
 function patchArticle(req, res, next) {
-  console.log(req);
+  const article_id = req.params.article_id;
+  const body = req.body;
+  amendArticle(article_id, body)
+    .then(response => {
+      res.status(200).send({ article: response });
+    })
+    .catch(next);
+}
+
+function postArticle(req, res, next) {
+  const article_id = req.article_id;
+  const body = req.body;
+  prepostArticle(article_id, body).then(response => {
+    res.status(201).send({ article: response });
+  });
 }
 
 module.exports = {
@@ -40,5 +60,6 @@ module.exports = {
   send405Error,
   getUser,
   getArticle,
-  patchArticle
+  patchArticle,
+  postArticle
 };

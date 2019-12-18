@@ -32,4 +32,24 @@ function fetchArticle(article_id) {
     });
 }
 
-module.exports = { fetchAllTopics, fetchUser, fetchArticle };
+function amendArticle(article_id, body) {
+  return knexion("articles")
+    .where("article_id", "=", article_id)
+    .increment("votes", body.inc_votes)
+    .returning("*");
+}
+
+function prepostArticle(article_id, body) {
+  console.log(body, "<< body in model, need to put article id in?");
+  return knexion("comments")
+    .insert(body)
+    .returning("*");
+}
+
+module.exports = {
+  fetchAllTopics,
+  fetchUser,
+  fetchArticle,
+  amendArticle,
+  prepostArticle
+};

@@ -141,22 +141,54 @@ describe("/api", () => {
         });
       });
       describe("PATCH", () => {
-        it.only("returns an updated article with the votes property incremented", () => {
+        it("returns an updated article with the votes property incremented", () => {
           return request
-            .patch("/api/articles/1", { inc_votes: 5 })
+            .patch("/api/articles/1")
+            .send({ inc_votes: 5 })
             .expect(200)
             .then(response => {
-              expect(response.body.article).to.deep.equal({
+              expect(response.body.article[0]).to.deep.equal({
                 article_id: 1,
                 title: "Living in the shadow of a great man",
                 body: "I find this existence challenging",
                 votes: 105,
                 topic: "mitch",
                 author: "butter_bridge",
-                created_at: "2018-11-15T12:21:54.171Z",
-                comment_count: "13"
+                created_at: "2018-11-15T12:21:54.171Z"
               });
             });
+        });
+      });
+      describe("/comments", () => {
+        describe.only("POST", () => {
+          it("adds a comment with the correct keys for a comment", () => {
+            return request
+              .post("/api/articles/1/comments")
+              .send({ username: "rogersop", body: "noishe" })
+              .expect(201)
+              .then(response => {
+                expect(response.body.comment[0]).to.have.keys(
+                  "comment_id",
+                  "author",
+                  "votes",
+                  "created_at",
+                  "body",
+                  "article_id"
+                );
+              });
+          });
+          it("adds a comment with the corresponding article id", () => {
+            return request
+              .post("/api/articles/1/comments")
+              .send({ username: "rogersop", body: "noishe" })
+              .expect(201)
+              .then(response => {
+                expect(response.body.comment[0]).to.(
+                  "username",
+                  "body"
+                );
+              });
+          });
         });
       });
     });
