@@ -48,10 +48,12 @@ function patchArticle(req, res, next) {
 }
 
 function postArticle(req, res, next) {
-  const article_id = req.article_id;
-  const body = req.body;
-  prepostArticle(article_id, body).then(response => {
-    res.status(201).send({ article: response });
+  const article_id = req.params.article_id;
+  console.log(article_id, "article id in controller");
+  const comment = req.body;
+  prepostArticle(article_id, comment).then(response => {
+    console.log(response, "response in controller");
+    res.status(201).send({ comment: response });
   });
 }
 

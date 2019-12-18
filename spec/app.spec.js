@@ -160,7 +160,7 @@ describe("/api", () => {
         });
       });
       describe("/comments", () => {
-        describe.only("POST", () => {
+        describe("POST", () => {
           it("adds a comment with the correct keys for a comment", () => {
             return request
               .post("/api/articles/1/comments")
@@ -170,10 +170,10 @@ describe("/api", () => {
                 expect(response.body.comment[0]).to.have.keys(
                   "comment_id",
                   "author",
+                  "article_id",
                   "votes",
                   "created_at",
-                  "body",
-                  "article_id"
+                  "body"
                 );
               });
           });
@@ -183,10 +183,7 @@ describe("/api", () => {
               .send({ username: "rogersop", body: "noishe" })
               .expect(201)
               .then(response => {
-                expect(response.body.comment[0]).to.(
-                  "username",
-                  "body"
-                );
+                expect(response.body.comment[0]).to.deep.equal({comment_id: 19, author: 'rogersop', article_id: 1, votes: 0, created_at: 2019-12-18T15:44:34.633Z, body: 'noishe'});
               });
           });
         });

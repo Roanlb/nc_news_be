@@ -10,7 +10,7 @@ exports.up = function(knex) {
       .references("articles.article_id")
       .notNullable();
     commentTable.integer("votes").defaultTo(0);
-    commentTable.string("created_at").defaultTo(Date.now());
+    commentTable.timestamp("created_at").defaultTo(knex.fn.now());
     commentTable.string("body", 8000).notNullable();
   });
 };

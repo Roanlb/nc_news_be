@@ -39,10 +39,15 @@ function amendArticle(article_id, body) {
     .returning("*");
 }
 
-function prepostArticle(article_id, body) {
-  console.log(body, "<< body in model, need to put article id in?");
+function prepostArticle(article_id, comment) {
+  console.log(comment, "<< comment in model, need to put article id in?");
+  console.log(article_id, "article id in model");
   return knexion("comments")
-    .insert(body)
+    .insert({
+      author: comment.username,
+      body: comment.body,
+      article_id: article_id
+    })
     .returning("*");
 }
 
