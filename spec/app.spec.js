@@ -80,7 +80,6 @@ describe("/api", () => {
             .get("/api/users/butterbridge")
             .expect(404)
             .then(response => {
-              console.log(response.body, "<<<< response received by test");
               expect(response.body).to.deep.equal({
                 msg: "User does not exist"
               });
@@ -109,7 +108,6 @@ describe("/api", () => {
             .get("/api/articles/1")
             .expect(200)
             .then(response => {
-              console.log(response.body, "<< response body in test");
               expect(response.body.article[0]).to.have.keys(
                 "author",
                 "title",
@@ -127,7 +125,6 @@ describe("/api", () => {
             .get("/api/articles/1")
             .expect(200)
             .then(response => {
-              console.log(response.body, "<< response body in test");
               expect(response.body.article[0].comment_count).to.equal("13");
             });
         });
@@ -137,6 +134,14 @@ describe("/api", () => {
             .expect(400)
             .then(response => {
               expect(response.body.msg).to.equal("Invalid id");
+            });
+        });
+        it("returns 404 with an appropriate message when given an valid nonexistent id", () => {
+          return request
+            .get("/api/articles/100")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Article does not exist");
             });
         });
       });
@@ -157,6 +162,45 @@ describe("/api", () => {
                 created_at: "2018-11-15T12:21:54.171Z"
               });
             });
+        });
+        it("returns 400 if patch is sent to an invalid id", () => {
+          return request
+            .patch("/api/articles/a")
+            .send({ inc_votes: 5 })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Invalid id");
+            });
+        });
+        it("returns 404 if patch is sent to a valid nonexistent id", () => {
+          return request
+            .patch("/api/articles/100")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Article does not exist");
+            });
+        });
+        it("returns 400 if patch is sent with a malformed body", () => {
+          return request
+            .patch("/api/articles/2")
+            .send({ inc_votse: 5 })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Malformed body");
+            });
+        });
+      });
+      describe("invalid methods", () => {
+        it("returns error 405 with message method not allowed", () => {
+          const invalidMethods = ["put", "delete"];
+          const methodPromises = invalidMethods.map(method => {
+            return request[method]("/api/articles/1")
+              .expect(405)
+              .then(response => {
+                expect(response.body.msg).to.equal("Method not allowed");
+              });
+          });
         });
       });
       describe("/comments", () => {
@@ -188,6 +232,79 @@ describe("/api", () => {
                 expect(response.body.comment[0].article_id).to.equal(1);
                 expect(response.body.comment[0].body).to.equal("noishe");
               });
+          });
+          it("returns status 404 if a valid but nonexistent article id is given", () => {
+            return request
+              .post("/api/articles/999/comments")
+              .send({ username: "rogersop", body: "noishe" })
+              .expect(404)
+              .then(response => {
+                expect(response.body.msg).to.equal("Not found");
+              });
+          });
+          it("returns 400 if an invalid article id is given", () => {
+            return request
+              .post("/api/articles/abc/comments")
+              .send({ username: "rogersop", body: "noishe" })
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal("Invalid id");
+              });
+          });
+          it("returns 405 if given a malformed body", () => {
+            return request
+              .post("/api/articles/2/comments")
+              .send({ usernmae: "rogersop", body: "noishe" })
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal("Malformed body");
+              });
+          });
+        });
+        describe.only("GET", () => {
+          it.only("responds with an array of comments for the given article id", () => {
+            return request
+              .get("/api/articles/1/comments")
+              .expect(200)
+              .then(response => {
+                console.log(response.body.comments, "array of comments");
+                expect(response.body.comments).to.be.sortedBy("created_at", {
+                  descending: true
+                });
+              });
+            it("works with a sort by query", () => {
+              return request
+                .get("/api/articles/1/comments?sort_by=votes")
+                .expect(200)
+                .then(response => {
+                  expect(response.body.comments).to.be.sortedBy("votes", {
+                    descending: true
+                  });
+                });
+            });
+            it("works with an order query", () => {
+              return request
+                .get("/api/articles/1/comments?sort_by=votes")
+                .expect(200)
+                .then(response => {
+                  expect(response.body.comments).to.be.sortedBy("votes", {
+                    descending: true
+                  });
+                });
+            });
+            it("works with a desc query", () => {});
+          });
+          describe("invalid methods", () => {
+            it("returns an appropriate error message if given an invalid method", () => {
+              const invalidMethods = ["patch", "put", "delete"];
+              const methodPromises = invalidMethods.map(method => {
+                return request[method]("/api/articles/1/comments")
+                  .expect(405)
+                  .then(response => {
+                    expect(response.body.msg).to.equal("Method not allowed");
+                  });
+              });
+            });
           });
         });
       });

@@ -33,22 +33,45 @@ function fetchArticle(article_id) {
 }
 
 function amendArticle(article_id, body) {
+  if (!body.hasOwnProperty("inc_votes")) {
+    return Promise.reject({ status: 400, msg: "Malformed body" });
+  }
   return knexion("articles")
     .where("article_id", "=", article_id)
     .increment("votes", body.inc_votes)
     .returning("*");
 }
 
-function prepostArticle(article_id, comment) {
-  console.log(comment, "<< comment in model, need to put article id in?");
-  console.log(article_id, "article id in model");
+function prepostComment(article_id, comment) {
+  console.log(comment, "comment in model");
+  if (!comment.hasOwnProperty("username") || !comment.hasOwnProperty("body")) {
+    return Promise.reject({ status: 400, msg: "Malformed body" });
+  } else
+    return knexion("comments")
+      .insert({
+        author: comment.username,
+        body: comment.body,
+        article_id: article_id
+      })
+      .returning("*");
+}
+
+function checkParentArticleExists(id) {
+  return knexion("articles")
+    .select("*")
+    .where("article_id", "=", id)
+    .then(existentArticleArray => {
+      if (!existentArticleArray.length) {
+        return Promise.reject({ status: 404, msg: "Article does not exist" });
+      }
+    });
+}
+
+function fetchComments(article_id, sort_by, order, author, topic) {
   return knexion("comments")
-    .insert({
-      author: comment.username,
-      body: comment.body,
-      article_id: article_id
-    })
-    .returning("*");
+    .select("*")
+    .where("article_id", "=", article_id)
+    .orderBy(sort_by || "created_at", order || "desc");
 }
 
 module.exports = {
@@ -56,5 +79,7 @@ module.exports = {
   fetchUser,
   fetchArticle,
   amendArticle,
-  prepostArticle
+  prepostComment,
+  checkParentArticleExists,
+  fetchComments
 };

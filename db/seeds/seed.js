@@ -22,10 +22,10 @@ exports.seed = function(knex) {
       return Promise.all([topicsInsertions, usersInsertions]);
     })
     .then(([topicsRows, userRows]) => {
-      console.log(
-        `inserted ${topicsRows.length} topics`,
-        `inserted ${userRows.length} users`
-      );
+      // console.log(
+      //   `inserted ${topicsRows.length} topics`,
+      //   `inserted ${userRows.length} users`
+      // );
       const formattedArticles = formatDates(articleData);
       return knex
         .insert(formattedArticles)
@@ -41,7 +41,7 @@ exports.seed = function(knex) {
       */
     })
     .then(articleRows => {
-      console.log(`inserted ${articleRows.length} articles`);
+      // console.log(`inserted ${articleRows.length} articles`);
       let refObj = makeRefObj(articleRows, "title", "article_id");
       let formattedComments = formatComments(commentData, refObj);
       return knex

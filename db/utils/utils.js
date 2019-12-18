@@ -1,13 +1,13 @@
 exports.formatDates = list => {
-  let listCopy = [];
+  // let listCopy = [];
 
-  for (let i = 0; i < list.length; i++) {
-    let obj = list[i];
-    let copyObj = { ...obj };
-    listCopy.push(copyObj);
-  }
+  // for (let i = 0; i < list.length; i++) {
+  //   let obj = list[i];
+  //   let copyObj = { ...obj };
+  //   listCopy.push(copyObj);
+  // }
 
-  listCopy = listCopy.map(item => {
+  const listCopy = list.map(item => {
     const formattedDate = new Date(item.created_at);
     item.created_at = formattedDate;
     return item;
