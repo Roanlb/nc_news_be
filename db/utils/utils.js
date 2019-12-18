@@ -25,13 +25,13 @@ exports.makeRefObj = (list, key, value) => {
 };
 
 exports.formatComments = (comments, articleRef) => {
-  const newComments = [...comments];
-  return newComments.map(comment => {
-    comment.article_id = articleRef[comment.belongs_to];
-    delete comment.belongs_to;
-    comment.author = comment.created_by;
-    comment.created_at = new Date(comment.created_at);
-    delete comment.created_by;
-    return comment;
+  return comments.map(comment => {
+    const newComment = { ...comment };
+    newComment.article_id = articleRef[newComment.belongs_to];
+    delete newComment.belongs_to;
+    newComment.author = newComment.created_by;
+    newComment.created_at = new Date(newComment.created_at);
+    delete newComment.created_by;
+    return newComment;
   });
 };

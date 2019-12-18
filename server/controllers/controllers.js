@@ -1,4 +1,4 @@
-const { fetchAllTopics, fetchUser } = require("../models/models");
+const { fetchAllTopics, fetchUser, fetchArticle } = require("../models/models");
 
 function getAllTopics(req, res, next) {
   fetchAllTopics()
@@ -21,4 +21,14 @@ function getUser(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getAllTopics, send405Error, getUser };
+function getArticle(req, res, next) {
+  console.log(req.params, "req params");
+  const { article_id } = req.params;
+  fetchArticle(article_id)
+    .then(response => {
+      res.status(200).send({ article: response });
+    })
+    .catch(next);
+}
+
+module.exports = { getAllTopics, send405Error, getUser, getArticle };

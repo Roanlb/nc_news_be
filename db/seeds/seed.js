@@ -56,6 +56,5 @@ exports.seed = function(knex) {
       
       You will need to write and test the provided makeRefObj and formatComments utility functions to be able insert your comment data.
       */
-    })
-    .catch(console.log);
+    });
 };

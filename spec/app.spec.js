@@ -101,4 +101,51 @@ describe("/api", () => {
       });
     });
   });
+  describe("/articles", () => {
+    describe("/:article_id", () => {
+      describe("GET", () => {
+        it("returns the article object corresponding to the given id", () => {
+          return request
+            .get("/api/articles/1")
+            .expect(200)
+            .then(response => {
+              console.log(response.body, "<< response body in test");
+              expect(response.body.article[0]).to.have.keys(
+                "author",
+                "title",
+                "article_id",
+                "body",
+                "topic",
+                "created_at",
+                "votes",
+                "comment_count"
+              );
+            });
+        });
+        it("returns a comment count which shows the number of comments associated with that article", () => {
+          return request
+            .get("/api/articles/1")
+            .expect(200)
+            .then(response => {
+              console.log(response.body, "<< response body in test");
+              expect(response.body.article[0].comment_count).to.equal("13");
+            });
+        });
+        it.only("returns 404 with an appropriate message when given an invalid article id", () => {
+          return request
+            .get("api/articles/a")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Invalid id");
+            });
+        });
+      });
+      // describe("PATCH", () => {
+      //   return request
+      //     .patch("/api/articles/1", {})
+      //     .expect(200)
+      //     .then(response);
+    });
+  });
 });
+// });
