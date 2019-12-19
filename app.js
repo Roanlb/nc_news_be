@@ -6,7 +6,6 @@ app.use(express.json());
 app.use("/api", apiRouter);
 
 app.use((err, req, res, next) => {
-  console.log("activated error handler", err);
   if (err.msg === "Malformed body") {
     res.status(400).send({ msg: err.msg });
   }

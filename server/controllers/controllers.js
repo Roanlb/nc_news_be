@@ -112,8 +112,6 @@ function getArticles(req, res, next) {
 function patchComment(req, res, next) {
   const comment_id = req.params.comment_id;
   const inc_votes = req.body.inc_votes;
-  console.log(comment_id, "comment id in patch comment controller");
-  console.log(inc_votes, " inc votes in patch comment controller");
   Promise.all([
     checkParentCommentExists(comment_id),
     amendComment(comment_id, inc_votes)
@@ -126,8 +124,6 @@ function patchComment(req, res, next) {
 
 function deleteComment(req, res, next) {
   const comment_id = req.params.comment_id;
-  console.log(comment_id, "comment id in controller");
-
   Promise.all([
     checkParentCommentExists(comment_id),
     obliterateComment(comment_id)

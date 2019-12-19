@@ -25,7 +25,6 @@ function fetchArticle(article_id) {
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
     .then(response => {
-      console.log(response, "response in model");
       if (!response.length) {
         return Promise.reject({ status: 404, msg: "Article does not exist" });
       } else return response;
@@ -43,7 +42,6 @@ function amendArticle(article_id, body) {
 }
 
 function prepostComment(article_id, comment) {
-  console.log(comment, "comment in model");
   if (!comment.hasOwnProperty("username") || !comment.hasOwnProperty("body")) {
     return Promise.reject({ status: 400, msg: "Malformed body" });
   } else
@@ -68,7 +66,6 @@ function checkParentArticleExists(id) {
 }
 
 function checkParentCommentExists(id) {
-  console.log(id, "id in model");
   return knexion("comments")
     .select("*")
     .where("comment_id", "=", id)
@@ -136,18 +133,6 @@ function checkTopicExists(topic) {
       }
     });
 }
-
-// function checkParentCommentExists(id) {
-//   console.log(id, "id in model");
-//   return knexion("comments")
-//     .select("*")
-//     .where("comment_id", "=", id)
-//     .then(existentCommentArray => {
-//       if (!existentCommentArray.length) {
-//         return Promise.reject({ status: 404, msg: "Comment does not exist" });
-//       }
-//     });
-// }
 
 module.exports = {
   fetchAllTopics,
