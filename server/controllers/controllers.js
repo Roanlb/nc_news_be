@@ -6,7 +6,10 @@ const {
   prepostComment,
   checkParentArticleExists,
   fetchComments,
-  fetchArticles
+  fetchArticles,
+  amendComment,
+  obliterateComment,
+  checkParentCommentExists
 } = require("../models/models");
 
 function getAllTopics(req, res, next) {
@@ -87,6 +90,36 @@ function getArticles(req, res, next) {
     .catch(next);
 }
 
+function patchComment(req, res, next) {
+  const comment_id = req.params;
+  const inc_votes = req.body.inc_votes;
+  // Promise.all([
+  //   checkParentArticleExists(article_id),
+  //   amendArticle(article_id, body)
+  // ]).then(responseThings => {
+  //   console.log(responseThings, "made it to patch error handler");
+  //   res.status(200).send({ article: responseThings[1] });
+  // });
+  Promise.all([
+    checkParentCommentExists(comment_id),
+    amendComment(comment_id, inc_votes)
+  ])
+    .then(responseThings => {
+      res.status(200).send({ comment: responseThings[1] });
+    })
+    .catch(next);
+}
+
+function deleteComment(req, res, next) {
+  const comment_id = req.params.comment_id;
+  console.log(comment_id);
+  obliterateComment(comment_id)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(next);
+}
+
 module.exports = {
   getAllTopics,
   send405Error,
@@ -95,5 +128,7 @@ module.exports = {
   patchArticle,
   postComment,
   getComments,
-  getArticles
+  getArticles,
+  patchComment,
+  deleteComment
 };

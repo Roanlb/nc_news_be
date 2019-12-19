@@ -8,6 +8,7 @@ exports.up = function(knex) {
     commentTable
       .integer("article_id")
       .references("articles.article_id")
+      .onDelete("CASCADE")
       .notNullable();
     commentTable.integer("votes").defaultTo(0);
     commentTable.timestamp("created_at").defaultTo(knex.fn.now());

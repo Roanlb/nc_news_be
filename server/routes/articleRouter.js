@@ -8,7 +8,10 @@ const {
   getArticles
 } = require("../controllers/controllers");
 
-articleRouter.route("/").get(getArticles);
+articleRouter
+  .route("/")
+  .get(getArticles)
+  .all(send405Error);
 
 articleRouter
   .route("/:article_id")

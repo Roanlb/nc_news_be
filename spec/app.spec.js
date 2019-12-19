@@ -101,7 +101,7 @@ describe("/api", () => {
     });
   });
   describe("/articles", () => {
-    describe.only("GET", () => {
+    describe("GET", () => {
       it("responds with an array of articles", () => {
         return request
           .get("/api/articles")
@@ -148,6 +148,16 @@ describe("/api", () => {
             response.body.articles.forEach(article => {
               expect(article.topic).to.equal("mitch");
             });
+          });
+      });
+    });
+    describe("invalid methods", () => {
+      it("returns method not allowed when given an invalid method request", () => {
+        return request
+          .patch("/api/articles")
+          .expect(405)
+          .then(response => {
+            expect(response.body.msg).to.equal("Method not allowed");
           });
       });
     });
@@ -380,12 +390,61 @@ describe("/api", () => {
             });
           });
         });
-        describe("/:comment_id", () => {
-          describe("PATCH", () => {
-            it(
-              "returns the specified comment with the votes property updated by inc_votes"
-            );
+      });
+    });
+  });
+  describe("/comments", () => {
+    describe("/:comment_id", () => {
+      describe("PATCH", () => {
+        it("returns the specified comment with the votes property updated by inc_votes", () => {
+          return request
+            .patch("/api/comments/1")
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then(response => {
+              expect(response.body.comment[0].votes).to.equal(21);
+              expect(response.body.comment[0]).to.deep.equal({
+                comment_id: 1,
+                author: "butter_bridge",
+                article_id: 9,
+                votes: 21,
+                created_at: "2017-11-22T12:36:03.389Z",
+                body:
+                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+              });
+            });
+        });
+        it("works with negative numbers for inc_votes", () => {
+          return request
+            .patch("/api/comments/1")
+            .send({ inc_votes: -5 })
+            .expect(200)
+            .then(response => {
+              expect(response.body.comment[0].votes).to.equal(11);
+              expect(response.body.comment[0]).to.deep.equal({
+                comment_id: 1,
+                author: "butter_bridge",
+                article_id: 9,
+                votes: 11,
+                created_at: "2017-11-22T12:36:03.389Z",
+                body:
+                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+              });
+            });
+        });
+      });
+      it("returns status 404 if given a valid but non-existent id", () => {
+        return request
+          .patch("/api/comments/999")
+          .send({ inc_votes: 5 })
+          .expect(404)
+          .then(response => {
+            expect(response.body.msg).to.equal("Comment does not exist");
           });
+      });
+      describe("DELETE", () => {
+        it("returns status 204", () => {
+          return request.del("/api/comments/2").expect(204);
         });
       });
     });

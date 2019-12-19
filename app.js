@@ -12,7 +12,8 @@ app.use((err, req, res, next) => {
   }
   if (
     (err.status === 404 && err.msg === "User does not exist") ||
-    (err.status === 404 && err.msg === "Article does not exist")
+    (err.status === 404 && err.msg === "Article does not exist") ||
+    (err.status === 404 && err.msg === "Comment does not exist")
   ) {
     res.status(404).send({ msg: err.msg });
   } else if (err.code === "22P02") res.status(400).send({ msg: "Invalid id" });
