@@ -327,7 +327,6 @@ describe("/api", () => {
               .get("/api/articles/1/comments")
               .expect(200)
               .then(response => {
-                console.log(response.body.comments, "array of comments");
                 expect(response.body.comments).to.be.sortedBy("created_at", {
                   descending: true
                 });
@@ -432,19 +431,44 @@ describe("/api", () => {
               });
             });
         });
-      });
-      it("returns status 404 if given a valid but non-existent id", () => {
-        return request
-          .patch("/api/comments/999")
-          .send({ inc_votes: 5 })
-          .expect(404)
-          .then(response => {
-            expect(response.body.msg).to.equal("Comment does not exist");
-          });
+        it("returns status 404 if given a valid but non-existent id", () => {
+          return request
+            .patch("/api/comments/999")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Comment does not exist");
+            });
+        });
+        it("returns status 400 if given an invalid id", () => {
+          return request
+            .patch("/api/comments/butter_bridge")
+            .send({ inc_votes: 5 })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Invalid id");
+            });
+        });
       });
       describe("DELETE", () => {
         it("returns status 204", () => {
-          return request.del("/api/comments/2").expect(204);
+          return request.delete("/api/comments/2").expect(204);
+        });
+        it("returns status 400 if given an invalid id", () => {
+          return request
+            .delete("/api/comments/the_beautiful_thing_about_treasure")
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Invalid id");
+            });
+        });
+        it("returns status 404 if given a valid but non existent id", () => {
+          return request
+            .delete("/api/comments/200")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Comment does not exist");
+            });
         });
       });
     });

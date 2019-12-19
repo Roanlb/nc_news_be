@@ -68,7 +68,7 @@ function checkParentArticleExists(id) {
 }
 
 function checkParentCommentExists(id) {
-  id = id.comment_id;
+  console.log(id, "id in model");
   return knexion("comments")
     .select("*")
     .where("comment_id", "=", id)
@@ -104,7 +104,7 @@ function fetchArticles(sort_by, order, author, topic) {
 
 function amendComment(comment_id, inc_votes) {
   return knexion("comments")
-    .where("comment_id", "=", comment_id.comment_id)
+    .where("comment_id", "=", comment_id)
     .increment("votes", inc_votes)
     .returning("*");
 }
