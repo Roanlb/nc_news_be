@@ -115,6 +115,40 @@ function obliterateComment(comment_id) {
     .del();
 }
 
+function checkUserExists(username) {
+  return knexion("users")
+    .select("*")
+    .where("username", "=", username)
+    .then(existentUserArray => {
+      if (!existentUserArray.length) {
+        return Promise.reject({ status: 404, msg: "User does not exist" });
+      }
+    });
+}
+
+function checkTopicExists(topic) {
+  return knexion("topics")
+    .select("*")
+    .where("slug", "=", topic)
+    .then(existentTopicArray => {
+      if (!existentTopicArray.length) {
+        return Promise.reject({ status: 404, msg: "Topic does not exist" });
+      }
+    });
+}
+
+// function checkParentCommentExists(id) {
+//   console.log(id, "id in model");
+//   return knexion("comments")
+//     .select("*")
+//     .where("comment_id", "=", id)
+//     .then(existentCommentArray => {
+//       if (!existentCommentArray.length) {
+//         return Promise.reject({ status: 404, msg: "Comment does not exist" });
+//       }
+//     });
+// }
+
 module.exports = {
   fetchAllTopics,
   fetchUser,
@@ -126,5 +160,7 @@ module.exports = {
   fetchArticles,
   amendComment,
   obliterateComment,
-  checkParentCommentExists
+  checkParentCommentExists,
+  checkUserExists,
+  checkTopicExists
 };

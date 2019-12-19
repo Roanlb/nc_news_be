@@ -9,7 +9,9 @@ const {
   fetchArticles,
   amendComment,
   obliterateComment,
-  checkParentCommentExists
+  checkParentCommentExists,
+  checkUserExists,
+  checkTopicExists
 } = require("../models/models");
 
 function getAllTopics(req, res, next) {
@@ -81,11 +83,30 @@ function getArticles(req, res, next) {
   const order = req.query.order;
   const author = req.query.author;
   const topic = req.query.topic;
-  fetchArticles(sort_by, order, author, topic)
-    .then(response => {
-      res.status(200).send({ articles: response });
-    })
-    .catch(next);
+  if (author) {
+    Promise.all([
+      checkUserExists(author),
+      fetchArticles(sort_by, order, author, topic)
+    ])
+      .then(responseThings => {
+        res.status(200).send({ articles: responseThings[1] });
+      })
+      .catch(next);
+  } else if (topic) {
+    Promise.all([
+      checkTopicExists(topic),
+      fetchArticles(sort_by, order, author, topic)
+    ])
+      .then(responseThings => {
+        res.status(200).send({ articles: responseThings[1] });
+      })
+      .catch(next);
+  } else
+    fetchArticles(sort_by, order, author, topic)
+      .then(response => {
+        res.status(200).send({ articles: response });
+      })
+      .catch(next);
 }
 
 function patchComment(req, res, next) {

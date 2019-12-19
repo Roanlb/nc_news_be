@@ -130,25 +130,45 @@ describe("/api", () => {
             expect(response.body.articles[1].comment_count).to.equal("0");
           });
       });
-      it("works with an author query", () => {
-        return request
-          .get("/api/articles/?author=butter_bridge")
-          .expect(200)
-          .then(response => {
-            response.body.articles.forEach(article => {
-              expect(article.author).to.equal("butter_bridge");
+      describe("author queries", () => {
+        it("works with an author query", () => {
+          return request
+            .get("/api/articles/?author=butter_bridge")
+            .expect(200)
+            .then(response => {
+              response.body.articles.forEach(article => {
+                expect(article.author).to.equal("butter_bridge");
+              });
             });
-          });
+        });
+        it("returns 404 if given a nonexistent author query", () => {
+          return request
+            .get("/api/articles/?author=bigmanroan")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("User does not exist");
+            });
+        });
       });
-      it("works with a topic query", () => {
-        return request
-          .get("/api/articles/?topic=mitch")
-          .expect(200)
-          .then(response => {
-            response.body.articles.forEach(article => {
-              expect(article.topic).to.equal("mitch");
+      describe("topic queries", () => {
+        it("works with a topic query", () => {
+          return request
+            .get("/api/articles/?topic=mitch")
+            .expect(200)
+            .then(response => {
+              response.body.articles.forEach(article => {
+                expect(article.topic).to.equal("mitch");
+              });
             });
-          });
+        });
+        it("returns 404 if given a nonexistent topic query", () => {
+          return request
+            .get("/api/articles/?topic=pokemon")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Topic does not exist");
+            });
+        });
       });
     });
     describe("invalid methods", () => {
