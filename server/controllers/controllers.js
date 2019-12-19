@@ -95,6 +95,7 @@ function getArticles(req, res, next) {
   const order = req.query.order;
   const author = req.query.author;
   const topic = req.query.topic;
+
   if (author) {
     Promise.all([
       checkUserExists(author),
