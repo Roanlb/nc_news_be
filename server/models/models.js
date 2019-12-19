@@ -67,11 +67,27 @@ function checkParentArticleExists(id) {
     });
 }
 
-function fetchComments(article_id, sort_by, order, author, topic) {
+function fetchComments(article_id, sort_by, order) {
   return knexion("comments")
     .select("*")
     .where("article_id", "=", article_id)
     .orderBy(sort_by || "created_at", order || "desc");
+}
+
+function fetchArticles(sort_by, order, author, topic) {
+  return knexion("articles")
+    .select("articles.*")
+    .from("articles")
+    .orderBy(sort_by || "articles.created_at", order || "desc")
+    .count({ comment_count: "comments.comment_id" })
+    .modify(query => {
+      if (author) query.where("articles.author", "=", author);
+    })
+    .modify(query => {
+      if (topic) query.where("articles.topic", "=", topic);
+    })
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id");
 }
 
 module.exports = {
@@ -81,5 +97,6 @@ module.exports = {
   amendArticle,
   prepostComment,
   checkParentArticleExists,
-  fetchComments
+  fetchComments,
+  fetchArticles
 };

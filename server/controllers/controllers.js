@@ -5,7 +5,8 @@ const {
   amendArticle,
   prepostComment,
   checkParentArticleExists,
-  fetchComments
+  fetchComments,
+  fetchArticles
 } = require("../models/models");
 
 function getAllTopics(req, res, next) {
@@ -65,15 +66,23 @@ function postComment(req, res, next) {
 
 function getComments(req, res, next) {
   const article_id = req.params.article_id;
-  console.log(req.query);
+  const sort_by = req.query.sort_by;
+  const order = req.query.order;
+  fetchComments(article_id, sort_by, order)
+    .then(response => {
+      res.status(200).send({ comments: response });
+    })
+    .catch(next);
+}
+
+function getArticles(req, res, next) {
   const sort_by = req.query.sort_by;
   const order = req.query.order;
   const author = req.query.author;
   const topic = req.query.topic;
-  fetchComments(article_id, sort_by, order, author, topic)
+  fetchArticles(sort_by, order, author, topic)
     .then(response => {
-      console.log(response, "response in controller");
-      res.status(200).send({ comments: response });
+      res.status(200).send({ articles: response });
     })
     .catch(next);
 }
@@ -85,5 +94,6 @@ module.exports = {
   getArticle,
   patchArticle,
   postComment,
-  getComments
+  getComments,
+  getArticles
 };

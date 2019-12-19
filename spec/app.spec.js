@@ -101,6 +101,56 @@ describe("/api", () => {
     });
   });
   describe("/articles", () => {
+    describe.only("GET", () => {
+      it("responds with an array of articles", () => {
+        return request
+          .get("/api/articles")
+          .expect(200)
+          .then(response => {
+            response.body.articles.forEach(article => {
+              expect(article).to.have.keys(
+                "article_id",
+                "title",
+                "body",
+                "votes",
+                "topic",
+                "author",
+                "created_at",
+                "comment_count"
+              );
+            });
+          });
+      });
+      it("returns articles with functioning comment_count", () => {
+        return request
+          .get("/api/articles")
+          .expect(200)
+          .then(response => {
+            expect(response.body.articles[0].comment_count).to.equal("13");
+            expect(response.body.articles[1].comment_count).to.equal("0");
+          });
+      });
+      it("works with an author query", () => {
+        return request
+          .get("/api/articles/?author=butter_bridge")
+          .expect(200)
+          .then(response => {
+            response.body.articles.forEach(article => {
+              expect(article.author).to.equal("butter_bridge");
+            });
+          });
+      });
+      it("works with a topic query", () => {
+        return request
+          .get("/api/articles/?topic=mitch")
+          .expect(200)
+          .then(response => {
+            response.body.articles.forEach(article => {
+              expect(article.topic).to.equal("mitch");
+            });
+          });
+      });
+    });
     describe("/:article_id", () => {
       describe("GET", () => {
         it("returns the article object corresponding to the given id", () => {
@@ -251,7 +301,7 @@ describe("/api", () => {
                 expect(response.body.msg).to.equal("Invalid id");
               });
           });
-          it("returns 405 if given a malformed body", () => {
+          it("returns 400 if given a malformed body", () => {
             return request
               .post("/api/articles/2/comments")
               .send({ usernmae: "rogersop", body: "noishe" })
@@ -261,8 +311,8 @@ describe("/api", () => {
               });
           });
         });
-        describe.only("GET", () => {
-          it.only("responds with an array of comments for the given article id", () => {
+        describe("GET", () => {
+          it("responds with an array of comments sorted by created_at descending by default", () => {
             return request
               .get("/api/articles/1/comments")
               .expect(200)
@@ -272,39 +322,69 @@ describe("/api", () => {
                   descending: true
                 });
               });
-            it("works with a sort by query", () => {
-              return request
-                .get("/api/articles/1/comments?sort_by=votes")
-                .expect(200)
-                .then(response => {
-                  expect(response.body.comments).to.be.sortedBy("votes", {
-                    descending: true
-                  });
-                });
-            });
-            it("works with an order query", () => {
-              return request
-                .get("/api/articles/1/comments?sort_by=votes")
-                .expect(200)
-                .then(response => {
-                  expect(response.body.comments).to.be.sortedBy("votes", {
-                    descending: true
-                  });
-                });
-            });
-            it("works with a desc query", () => {});
           });
-          describe("invalid methods", () => {
-            it("returns an appropriate error message if given an invalid method", () => {
-              const invalidMethods = ["patch", "put", "delete"];
-              const methodPromises = invalidMethods.map(method => {
-                return request[method]("/api/articles/1/comments")
-                  .expect(405)
-                  .then(response => {
-                    expect(response.body.msg).to.equal("Method not allowed");
-                  });
+          it("responds with an array of comments for the given article id", () => {
+            return request
+              .get("/api/articles/5/comments")
+              .expect(200)
+              .then(response => {
+                expect(response.body.comments).to.deep.equal([
+                  {
+                    comment_id: 14,
+                    author: "icellusedkars",
+                    article_id: 5,
+                    votes: 16,
+                    created_at: "2004-11-25T12:36:03.389Z",
+                    body:
+                      "What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge."
+                  },
+                  {
+                    comment_id: 15,
+                    author: "butter_bridge",
+                    article_id: 5,
+                    votes: 1,
+                    created_at: "2003-11-26T12:36:03.389Z",
+                    body: "I am 100% sure that we're not completely sure."
+                  }
+                ]);
               });
+          });
+          it("works with a sort by query", () => {
+            return request
+              .get("/api/articles/1/comments?sort_by=votes")
+              .expect(200)
+              .then(response => {
+                expect(response.body.comments).to.be.sortedBy("votes", {
+                  descending: true
+                });
+              });
+          });
+          it("works with an order query", () => {
+            return request
+              .get("/api/articles/1/comments?order=asc")
+              .expect(200)
+              .then(response => {
+                expect(response.body.comments).to.be.sortedBy("created_at");
+              });
+          });
+        });
+        describe("invalid methods", () => {
+          it("returns an appropriate error message if given an invalid method", () => {
+            const invalidMethods = ["patch", "put", "delete"];
+            const methodPromises = invalidMethods.map(method => {
+              return request[method]("/api/articles/1/comments")
+                .expect(405)
+                .then(response => {
+                  expect(response.body.msg).to.equal("Method not allowed");
+                });
             });
+          });
+        });
+        describe("/:comment_id", () => {
+          describe("PATCH", () => {
+            it(
+              "returns the specified comment with the votes property updated by inc_votes"
+            );
           });
         });
       });
