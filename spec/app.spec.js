@@ -388,6 +388,16 @@ describe("/api", () => {
                 });
               });
           });
+          it("returns 400 if given a non existent column", () => {
+            return request
+              .get("/api/articles/1/comments?sort_by=column2")
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal(
+                  "Sort by column does not exist"
+                );
+              });
+          });
           it("works with an order query", () => {
             return request
               .get("/api/articles/1/comments?order=asc")
@@ -396,99 +406,107 @@ describe("/api", () => {
                 expect(response.body.comments).to.be.sortedBy("created_at");
               });
           });
-        });
-        describe("invalid methods", () => {
-          it("returns an appropriate error message if given an invalid method", () => {
-            const invalidMethods = ["patch", "put", "delete"];
-            const methodPromises = invalidMethods.map(method => {
-              return request[method]("/api/articles/1/comments")
-                .expect(405)
-                .then(response => {
-                  expect(response.body.msg).to.equal("Method not allowed");
-                });
+          it("returns 400 if given an invalid order", () => {
+            return request
+              .get("/api/articles/1/comments?order=bbq")
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal("Order must be asc or desc");
+              });
+          });
+          describe("invalid methods", () => {
+            it("returns an appropriate error message if given an invalid method", () => {
+              const invalidMethods = ["patch", "put", "delete"];
+              const methodPromises = invalidMethods.map(method => {
+                return request[method]("/api/articles/1/comments")
+                  .expect(405)
+                  .then(response => {
+                    expect(response.body.msg).to.equal("Method not allowed");
+                  });
+              });
             });
           });
         });
       });
     });
-  });
-  describe("/comments", () => {
-    describe("/:comment_id", () => {
-      describe("PATCH", () => {
-        it("returns the specified comment with the votes property updated by inc_votes", () => {
-          return request
-            .patch("/api/comments/1")
-            .send({ inc_votes: 5 })
-            .expect(200)
-            .then(response => {
-              expect(response.body.comment[0].votes).to.equal(21);
-              expect(response.body.comment[0]).to.deep.equal({
-                comment_id: 1,
-                author: "butter_bridge",
-                article_id: 9,
-                votes: 21,
-                created_at: "2017-11-22T12:36:03.389Z",
-                body:
-                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+    describe("/comments", () => {
+      describe("/:comment_id", () => {
+        describe("PATCH", () => {
+          it("returns the specified comment with the votes property updated by inc_votes", () => {
+            return request
+              .patch("/api/comments/1")
+              .send({ inc_votes: 5 })
+              .expect(200)
+              .then(response => {
+                expect(response.body.comment[0].votes).to.equal(21);
+                expect(response.body.comment[0]).to.deep.equal({
+                  comment_id: 1,
+                  author: "butter_bridge",
+                  article_id: 9,
+                  votes: 21,
+                  created_at: "2017-11-22T12:36:03.389Z",
+                  body:
+                    "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+                });
               });
-            });
-        });
-        it("works with negative numbers for inc_votes", () => {
-          return request
-            .patch("/api/comments/1")
-            .send({ inc_votes: -5 })
-            .expect(200)
-            .then(response => {
-              expect(response.body.comment[0].votes).to.equal(11);
-              expect(response.body.comment[0]).to.deep.equal({
-                comment_id: 1,
-                author: "butter_bridge",
-                article_id: 9,
-                votes: 11,
-                created_at: "2017-11-22T12:36:03.389Z",
-                body:
-                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+          });
+          it("works with negative numbers for inc_votes", () => {
+            return request
+              .patch("/api/comments/1")
+              .send({ inc_votes: -5 })
+              .expect(200)
+              .then(response => {
+                expect(response.body.comment[0].votes).to.equal(11);
+                expect(response.body.comment[0]).to.deep.equal({
+                  comment_id: 1,
+                  author: "butter_bridge",
+                  article_id: 9,
+                  votes: 11,
+                  created_at: "2017-11-22T12:36:03.389Z",
+                  body:
+                    "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+                });
               });
-            });
+          });
+          it("returns status 404 if given a valid but non-existent id", () => {
+            return request
+              .patch("/api/comments/999")
+              .send({ inc_votes: 5 })
+              .expect(404)
+              .then(response => {
+                expect(response.body.msg).to.equal("Comment does not exist");
+              });
+          });
+          it("returns status 400 if given an invalid id", () => {
+            return request
+              .patch("/api/comments/butter_bridge")
+              .send({ inc_votes: 5 })
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal("Invalid id");
+              });
+          });
         });
-        it("returns status 404 if given a valid but non-existent id", () => {
-          return request
-            .patch("/api/comments/999")
-            .send({ inc_votes: 5 })
-            .expect(404)
-            .then(response => {
-              expect(response.body.msg).to.equal("Comment does not exist");
-            });
-        });
-        it("returns status 400 if given an invalid id", () => {
-          return request
-            .patch("/api/comments/butter_bridge")
-            .send({ inc_votes: 5 })
-            .expect(400)
-            .then(response => {
-              expect(response.body.msg).to.equal("Invalid id");
-            });
-        });
-      });
-      describe("DELETE", () => {
-        it("returns status 204", () => {
-          return request.delete("/api/comments/2").expect(204);
-        });
-        it("returns status 400 if given an invalid id", () => {
-          return request
-            .delete("/api/comments/the_beautiful_thing_about_treasure")
-            .expect(400)
-            .then(response => {
-              expect(response.body.msg).to.equal("Invalid id");
-            });
-        });
-        it("returns status 404 if given a valid but non existent id", () => {
-          return request
-            .delete("/api/comments/200")
-            .expect(404)
-            .then(response => {
-              expect(response.body.msg).to.equal("Comment does not exist");
-            });
+        describe("DELETE", () => {
+          it("returns status 204", () => {
+            return request.delete("/api/comments/2").expect(204);
+          });
+          it("returns status 400 if given an invalid id", () => {
+            return request
+              .delete("/api/comments/the_beautiful_thing_about_treasure")
+              .expect(400)
+              .then(response => {
+                expect(response.body.msg).to.equal("Invalid id");
+              });
+          });
+          it("returns status 404 if given a valid but non existent id", () => {
+            return request
+              .delete("/api/comments/200")
+              .expect(404)
+              .then(response => {
+                expect(response.body.msg).to.equal("Comment does not exist");
+              });
+          });
         });
       });
     });

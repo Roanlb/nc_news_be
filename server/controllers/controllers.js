@@ -11,7 +11,8 @@ const {
   obliterateComment,
   checkParentCommentExists,
   checkUserExists,
-  checkTopicExists
+  checkTopicExists,
+  checkColumnExists
 } = require("../models/models");
 
 function getAllTopics(req, res, next) {
@@ -71,11 +72,22 @@ function getComments(req, res, next) {
   const article_id = req.params.article_id;
   const sort_by = req.query.sort_by;
   const order = req.query.order;
-  fetchComments(article_id, sort_by, order)
-    .then(response => {
-      res.status(200).send({ comments: response });
-    })
-    .catch(next);
+
+  if (sort_by) {
+    Promise.all([
+      checkColumnExists(sort_by),
+      fetchComments(article_id, sort_by, order)
+    ])
+      .then(responseThings => {
+        res.status(200).send({ comments: responseThings[1] });
+      })
+      .catch(next);
+  } else
+    fetchComments(article_id, sort_by, order)
+      .then(commentsResponse => {
+        res.status(200).send({ comments: commentsResponse });
+      })
+      .catch(next);
 }
 
 function getArticles(req, res, next) {

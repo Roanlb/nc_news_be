@@ -9,6 +9,12 @@ app.use((err, req, res, next) => {
   if (err.msg === "Malformed body") {
     res.status(400).send({ msg: err.msg });
   }
+  if (err.msg === "Order must be asc or desc") {
+    res.status(400).send({ msg: err.msg });
+  }
+  if (err.code === "42703") {
+    res.status(400).send({ msg: "Sort by column does not exist" });
+  }
   if (
     (err.status === 404 && err.msg === "User does not exist") ||
     (err.status === 404 && err.msg === "Article does not exist") ||

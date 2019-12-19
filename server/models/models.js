@@ -77,10 +77,26 @@ function checkParentCommentExists(id) {
 }
 
 function fetchComments(article_id, sort_by, order) {
+  if (order) {
+    if (order !== "asc" && order !== "desc")
+      return Promise.reject({ status: 400, msg: "Order must be asc or desc" });
+  }
+
   return knexion("comments")
     .select("*")
     .where("article_id", "=", article_id)
     .orderBy(sort_by || "created_at", order || "desc");
+}
+
+function checkColumnExists(column) {
+  return knexion.schema.hasColumn("comments", column).then(response => {
+    if (!response) {
+      return Promise.reject({
+        status: 400,
+        msg: "Sort by column does not exist"
+      });
+    }
+  });
 }
 
 function fetchArticles(sort_by, order, author, topic) {
@@ -147,5 +163,6 @@ module.exports = {
   obliterateComment,
   checkParentCommentExists,
   checkUserExists,
-  checkTopicExists
+  checkTopicExists,
+  checkColumnExists
 };
