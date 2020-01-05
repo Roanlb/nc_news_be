@@ -1,37 +1,15 @@
 const {
-  fetchAllTopics,
-  fetchUser,
   fetchArticle,
   amendArticle,
   prepostComment,
   checkParentArticleExists,
   fetchComments,
   fetchArticles,
-  amendComment,
-  obliterateComment,
-  checkParentCommentExists,
   checkUserExists,
   checkTopicExists,
   checkColumnExists,
   checkOrder
-} = require("../models/models");
-
-function getAllTopics(req, res, next) {
-  fetchAllTopics()
-    .then(topics => {
-      res.status(200).send({ topics });
-    })
-    .catch(next);
-}
-
-function getUser(req, res, next) {
-  const { username } = req.params;
-  fetchUser(username)
-    .then(response => {
-      res.status(200).send({ user: response[0] });
-    })
-    .catch(next);
-}
+} = require("../models/articleModels");
 
 function getArticle(req, res, next) {
   const { article_id } = req.params;
@@ -138,60 +116,10 @@ function getArticles(req, res, next) {
   }
 }
 
-function patchComment(req, res, next) {
-  const comment_id = req.params.comment_id;
-  const inc_votes = req.body.inc_votes;
-  Promise.all([
-    checkParentCommentExists(comment_id),
-    amendComment(comment_id, inc_votes)
-  ])
-    .then(responseThings => {
-      res.status(200).send({ comment: responseThings[1][0] });
-    })
-    .catch(next);
-}
-
-function deleteComment(req, res, next) {
-  const comment_id = req.params.comment_id;
-  Promise.all([
-    checkParentCommentExists(comment_id),
-    obliterateComment(comment_id)
-  ])
-    .then(responseThings => {
-      res.sendStatus(204);
-    })
-    .catch(next);
-}
-
-function getEndpoints(req, res, next) {
-  res
-    .status(200)
-    .send({
-      endpoints: {
-        "/api": "GET",
-        "/api/topics": "GET",
-        "/api/users/:username": "GET",
-        "/api/articles/:article_id": "GET",
-        "/api/articles/:article_id": "PATCH",
-        "/api/articles/:article_id/comments": "POST",
-        "/api/articles/:article_id/comments": "GET",
-        "/api/articles": "GET",
-        "api/comments/:comment_id": "PATCH",
-        "api/comments/:comment_id": "DELETE"
-      }
-    })
-    .catch(next);
-}
-
 module.exports = {
-  getAllTopics,
-  getUser,
   getArticle,
   patchArticle,
   postComment,
   getComments,
-  getArticles,
-  patchComment,
-  deleteComment,
-  getEndpoints
+  getArticles
 };

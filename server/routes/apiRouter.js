@@ -3,7 +3,7 @@ const { topicRouter } = require("./topicRouter");
 const { userRouter } = require("./userRouter");
 const { articleRouter } = require("./articleRouter");
 const { commentRouter } = require("./commentRouter");
-const { getEndpoints } = require("../controllers/controllers");
+const { getEndpoints } = require("../controllers/apiControllers");
 const { send405Error } = require("../errorHandlers/errorHandlers");
 
 apiRouter

@@ -5,7 +5,7 @@ const {
   postComment,
   getComments,
   getArticles
-} = require("../controllers/controllers");
+} = require("../controllers/articleControllers");
 const { send405Error } = require("../errorHandlers/errorHandlers");
 
 articleRouter

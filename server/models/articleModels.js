@@ -1,21 +1,5 @@
 const knexion = require("../../connection");
 
-function fetchAllTopics() {
-  return knexion.select("*").from("topics");
-}
-
-function fetchUser(username) {
-  return knexion
-    .select("*")
-    .from("users")
-    .where("username", username)
-    .then(response => {
-      if (!response.length) {
-        return Promise.reject({ status: 404, msg: "User does not exist" });
-      } else return response;
-    });
-}
-
 function fetchArticle(article_id) {
   return knexion
     .select("articles.*")
@@ -65,17 +49,6 @@ function checkParentArticleExists(id) {
     });
 }
 
-function checkParentCommentExists(id) {
-  return knexion("comments")
-    .select("*")
-    .where("comment_id", "=", id)
-    .then(existentCommentArray => {
-      if (!existentCommentArray.length) {
-        return Promise.reject({ status: 404, msg: "Comment does not exist" });
-      }
-    });
-}
-
 function checkOrder(order) {
   if (order != "asc" && order != "desc") {
     return Promise.reject({ status: 400, msg: "Order must be asc or desc" });
@@ -121,19 +94,6 @@ function fetchArticles(sort_by, order, author, topic) {
     .groupBy("articles.article_id");
 }
 
-function amendComment(comment_id, inc_votes) {
-  return knexion("comments")
-    .where("comment_id", "=", comment_id)
-    .increment("votes", inc_votes || 0)
-    .returning("*");
-}
-
-function obliterateComment(comment_id) {
-  return knexion("comments")
-    .where("comment_id", "=", comment_id)
-    .del();
-}
-
 function checkUserExists(username) {
   return knexion("users")
     .select("*")
@@ -157,17 +117,12 @@ function checkTopicExists(topic) {
 }
 
 module.exports = {
-  fetchAllTopics,
-  fetchUser,
   fetchArticle,
   amendArticle,
   prepostComment,
   checkParentArticleExists,
   fetchComments,
   fetchArticles,
-  amendComment,
-  obliterateComment,
-  checkParentCommentExists,
   checkUserExists,
   checkTopicExists,
   checkColumnExists,

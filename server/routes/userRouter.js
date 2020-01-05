@@ -1,5 +1,5 @@
 const userRouter = require("express").Router();
-const { getUser } = require("../controllers/controllers");
+const { getUser } = require("../controllers/userControllers");
 const { send405Error } = require("../errorHandlers/errorHandlers");
 
 userRouter
