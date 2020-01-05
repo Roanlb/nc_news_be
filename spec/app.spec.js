@@ -62,7 +62,6 @@ describe("/api", () => {
           .get("/api/topics")
           .expect(200)
           .then(response => {
-            console.log(response.body.topics);
             expect(response.body.topics).to.deep.equal([
               {
                 description: "The man, the Mitch, the legend",
@@ -433,164 +432,165 @@ describe("/api", () => {
         });
       });
     });
-  });
-  //articles should end here
-  describe("/comments", () => {
-    describe("POST", () => {
-      it("adds a comment with the correct keys for a comment", () => {
-        return request
-          .post("/api/articles/1/comments")
-          .send({ username: "rogersop", body: "noishe" })
-          .expect(201)
-          .then(response => {
-            expect(response.body.comment).to.have.keys(
-              "comment_id",
-              "author",
-              "votes",
-              "created_at",
-              "body"
-            );
-          });
-      });
-      it("adds a comment with the votes property defaulting to 0", () => {
-        return request
-          .post("/api/articles/1/comments")
-          .send({ username: "rogersop", body: "noishe" })
-          .expect(201)
-          .then(response => {
-            expect(response.body.comment.votes).to.equal(0);
-          });
-      });
-      it("adds a comment with the author and body as specified", () => {
-        return request
-          .post("/api/articles/1/comments")
-          .send({ username: "rogersop", body: "noishe" })
-          .expect(201)
-          .then(response => {
-            expect(response.body.comment.author).to.equal("rogersop");
-            expect(response.body.comment.body).to.equal("noishe");
-          });
-      });
-      it("adds a comment with the corresponding article id", () => {
-        return request
-          .post("/api/articles/1/comments")
-          .send({ username: "rogersop", body: "noishe" })
-          .expect(201)
-          .then(() => {
-            return request
-              .get("/api/articles/1/comments")
-              .expect(200)
-              .then(response => {
-                expect(response.body.comments[0].comment_id).to.equal(19);
-              });
-          });
-      });
-      it("returns status 404 if a valid but nonexistent article id is given", () => {
-        return request
-          .post("/api/articles/999/comments")
-          .send({ username: "rogersop", body: "noishe" })
-          .expect(404)
-          .then(response => {
-            expect(response.body.msg).to.equal("Not found");
-          });
-      });
-      it("returns 400 if an invalid article id is given", () => {
-        return request
-          .post("/api/articles/abc/comments")
-          .send({ username: "rogersop", body: "noishe" })
-          .expect(400)
-          .then(response => {
-            expect(response.body.msg).to.equal("Invalid id");
-          });
-      });
-      it("returns 400 if given a malformed body", () => {
-        return request
-          .post("/api/articles/2/comments")
-          .send({ usernmae: "rogersop", body: "noishe" })
-          .expect(400)
-          .then(response => {
-            expect(response.body.msg).to.equal("Malformed body");
-          });
-      });
-    });
-    describe("GET", () => {
-      it("responds with an array of comments sorted by created_at descending by default", () => {
-        return request
-          .get("/api/articles/1/comments")
-          .expect(200)
-          .then(response => {
-            expect(response.body.comments).to.be.sortedBy("created_at", {
-              descending: true
+    describe("/comments", () => {
+      describe("POST", () => {
+        it("adds a comment with the correct keys for a comment", () => {
+          return request
+            .post("/api/articles/1/comments")
+            .send({ username: "rogersop", body: "noishe" })
+            .expect(201)
+            .then(response => {
+              expect(response.body.comment).to.have.keys(
+                "comment_id",
+                "author",
+                "votes",
+                "created_at",
+                "body"
+              );
             });
-          });
-      });
-      it("responds with an array of comments for the given article id", () => {
-        return request
-          .get("/api/articles/5/comments")
-          .expect(200)
-          .then(response => {
-            expect(response.body.comments).to.deep.equal([
-              {
-                comment_id: 14,
-                author: "icellusedkars",
-                votes: 16,
-                created_at: "2004-11-25T12:36:03.389Z",
-                body:
-                  "What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge."
-              },
-              {
-                comment_id: 15,
-                author: "butter_bridge",
-                votes: 1,
-                created_at: "2003-11-26T12:36:03.389Z",
-                body: "I am 100% sure that we're not completely sure."
-              }
-            ]);
-          });
-      });
-      it("works with a sort by query", () => {
-        return request
-          .get("/api/articles/1/comments?sort_by=votes")
-          .expect(200)
-          .then(response => {
-            expect(response.body.comments).to.be.sortedBy("votes", {
-              descending: true
+        });
+        it("adds a comment with the votes property defaulting to 0", () => {
+          return request
+            .post("/api/articles/1/comments")
+            .send({ username: "rogersop", body: "noishe" })
+            .expect(201)
+            .then(response => {
+              expect(response.body.comment.votes).to.equal(0);
             });
-          });
+        });
+        it("adds a comment with the author and body as specified", () => {
+          return request
+            .post("/api/articles/1/comments")
+            .send({ username: "rogersop", body: "noishe" })
+            .expect(201)
+            .then(response => {
+              expect(response.body.comment.author).to.equal("rogersop");
+              expect(response.body.comment.body).to.equal("noishe");
+            });
+        });
+        it("adds a comment with the corresponding article id", () => {
+          return request
+            .post("/api/articles/1/comments")
+            .send({ username: "rogersop", body: "noishe" })
+            .expect(201)
+            .then(() => {
+              return request
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then(response => {
+                  expect(response.body.comments[0].comment_id).to.equal(19);
+                });
+            });
+        });
+        it("returns status 404 if a valid but nonexistent article id is given", () => {
+          return request
+            .post("/api/articles/999/comments")
+            .send({ username: "rogersop", body: "noishe" })
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Not found");
+            });
+        });
+        it("returns 400 if an invalid article id is given", () => {
+          return request
+            .post("/api/articles/abc/comments")
+            .send({ username: "rogersop", body: "noishe" })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Invalid id");
+            });
+        });
+        it("returns 400 if given a malformed body", () => {
+          return request
+            .post("/api/articles/2/comments")
+            .send({ usernmae: "rogersop", body: "noishe" })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Malformed body");
+            });
+        });
       });
-      it("returns 400 if given a non existent column", () => {
-        return request
-          .get("/api/articles/1/comments?sort_by=column2")
-          .expect(400)
-          .then(response => {
-            expect(response.body.msg).to.equal("Sort by column does not exist");
-          });
-      });
-      it("works with an order query", () => {
-        return request
-          .get("/api/articles/1/comments?order=asc")
-          .expect(200)
-          .then(response => {
-            expect(response.body.comments).to.be.sortedBy("created_at");
-          });
-      });
-      it("returns 400 if given an invalid order", () => {
-        return request
-          .get("/api/articles/1/comments?order=bbq")
-          .expect(400)
-          .then(response => {
-            expect(response.body.msg).to.equal("Order must be asc or desc");
-          });
-      });
-      describe("invalid methods", () => {
-        it("returns an appropriate error message if given an invalid method", () => {
-          const invalidMethods = ["patch", "put", "delete"];
-          const methodPromises = invalidMethods.map(method => {
-            return request[method]("/api/articles/1/comments")
-              .expect(405)
-              .then(response => {
-                expect(response.body.msg).to.equal("Method not allowed");
+      describe("GET", () => {
+        it("responds with an array of comments sorted by created_at descending by default", () => {
+          return request
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(response => {
+              expect(response.body.comments).to.be.sortedBy("created_at", {
+                descending: true
               });
+            });
+        });
+        it("responds with an array of comments for the given article id", () => {
+          return request
+            .get("/api/articles/5/comments")
+            .expect(200)
+            .then(response => {
+              expect(response.body.comments).to.deep.equal([
+                {
+                  comment_id: 14,
+                  author: "icellusedkars",
+                  votes: 16,
+                  created_at: "2004-11-25T12:36:03.389Z",
+                  body:
+                    "What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge."
+                },
+                {
+                  comment_id: 15,
+                  author: "butter_bridge",
+                  votes: 1,
+                  created_at: "2003-11-26T12:36:03.389Z",
+                  body: "I am 100% sure that we're not completely sure."
+                }
+              ]);
+            });
+        });
+        it("works with a sort by query", () => {
+          return request
+            .get("/api/articles/1/comments?sort_by=votes")
+            .expect(200)
+            .then(response => {
+              expect(response.body.comments).to.be.sortedBy("votes", {
+                descending: true
+              });
+            });
+        });
+        it("returns 400 if given a non existent column", () => {
+          return request
+            .get("/api/articles/1/comments?sort_by=column2")
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                "Sort by column does not exist"
+              );
+            });
+        });
+        it("works with an order query", () => {
+          return request
+            .get("/api/articles/1/comments?order=asc")
+            .expect(200)
+            .then(response => {
+              expect(response.body.comments).to.be.sortedBy("created_at");
+            });
+        });
+        it("returns 400 if given an invalid order", () => {
+          return request
+            .get("/api/articles/1/comments?order=bbq")
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Order must be asc or desc");
+            });
+        });
+        describe("invalid methods", () => {
+          it("returns an appropriate error message if given an invalid method", () => {
+            const invalidMethods = ["patch", "put", "delete"];
+            const methodPromises = invalidMethods.map(method => {
+              return request[method]("/api/articles/1/comments")
+                .expect(405)
+                .then(response => {
+                  expect(response.body.msg).to.equal("Method not allowed");
+                });
+            });
           });
         });
       });
