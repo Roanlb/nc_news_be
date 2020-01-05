@@ -3,14 +3,18 @@
   "version": "1.0.0",
   "description": "bc-nc-news",
   "main": "index.js",
+  "start": "node listen.js",
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "knex seed:run",
+    "seed:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex seed:run",
     "test-utils": "mocha spec/utils.spec.js",
     "test": "mocha spec/app.spec.js",
     "migrate-make": "npx knex migrate:make",
     "migrate-latest": "npx knex migrate:latest",
-    "migrate-rollback": "npx knex migrate:rollback"
+    "migrate-latest:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:latest",
+    "migrate-rollback": "npx knex migrate:rollback",
+    "migrate-rollback:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:rollback"
   },
   "repository": {
     "type": "git",
