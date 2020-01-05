@@ -1,4 +1,4 @@
-const knexion = require("../../db/data/connection");
+const knexion = require("../../connection");
 
 function fetchAllTopics() {
   return knexion.select("*").from("topics");
@@ -32,12 +32,12 @@ function fetchArticle(article_id) {
 }
 
 function amendArticle(article_id, body) {
-  if (!body.hasOwnProperty("inc_votes")) {
-    return Promise.reject({ status: 400, msg: "Malformed body" });
-  }
+  // if (!body.hasOwnProperty("inc_votes") && body isnt empty) {
+  //   return Promise.reject({ status: 400, msg: "Malformed body" });
+  // }
   return knexion("articles")
     .where("article_id", "=", article_id)
-    .increment("votes", body.inc_votes)
+    .increment("votes", body.inc_votes || 0)
     .returning("*");
 }
 
@@ -51,7 +51,7 @@ function prepostComment(article_id, comment) {
         body: comment.body,
         article_id: article_id
       })
-      .returning("*");
+      .returning(["comment_id", "author", "votes", "created_at", "body"]);
 }
 
 function checkParentArticleExists(id) {
@@ -76,6 +76,12 @@ function checkParentCommentExists(id) {
     });
 }
 
+function checkOrder(order) {
+  if (order != "asc" && order != "desc") {
+    return Promise.reject({ status: 400, msg: "Order must be asc or desc" });
+  }
+}
+
 function fetchComments(article_id, sort_by, order) {
   if (order) {
     if (order !== "asc" && order !== "desc")
@@ -83,7 +89,7 @@ function fetchComments(article_id, sort_by, order) {
   }
 
   return knexion("comments")
-    .select("*")
+    .select("comment_id", "author", "votes", "created_at", "body")
     .where("article_id", "=", article_id)
     .orderBy(sort_by || "created_at", order || "desc");
 }
@@ -118,7 +124,7 @@ function fetchArticles(sort_by, order, author, topic) {
 function amendComment(comment_id, inc_votes) {
   return knexion("comments")
     .where("comment_id", "=", comment_id)
-    .increment("votes", inc_votes)
+    .increment("votes", inc_votes || 0)
     .returning("*");
 }
 
@@ -164,5 +170,6 @@ module.exports = {
   checkParentCommentExists,
   checkUserExists,
   checkTopicExists,
-  checkColumnExists
+  checkColumnExists,
+  checkOrder
 };

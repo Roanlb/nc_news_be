@@ -12,7 +12,8 @@ const {
   checkParentCommentExists,
   checkUserExists,
   checkTopicExists,
-  checkColumnExists
+  checkColumnExists,
+  checkOrder
 } = require("../models/models");
 
 function getAllTopics(req, res, next) {
@@ -21,10 +22,6 @@ function getAllTopics(req, res, next) {
       res.status(200).send({ topics });
     })
     .catch(next);
-}
-
-function send405Error(req, res, next) {
-  res.status(405).send({ msg: "Method not allowed" });
 }
 
 function getUser(req, res, next) {
@@ -39,7 +36,7 @@ function getUser(req, res, next) {
 function getArticle(req, res, next) {
   const { article_id } = req.params;
   fetchArticle(article_id)
-    .then(response => {
+    .then(([response]) => {
       res.status(200).send({ article: response });
     })
     .catch(next);
@@ -53,7 +50,7 @@ function patchArticle(req, res, next) {
     amendArticle(article_id, body)
   ])
     .then(responseThings => {
-      res.status(200).send({ article: responseThings[1] });
+      res.status(200).send({ article: responseThings[1][0] });
     })
     .catch(next);
 }
@@ -63,7 +60,7 @@ function postComment(req, res, next) {
   const comment = req.body;
   prepostComment(article_id, comment)
     .then(response => {
-      res.status(201).send({ comment: response });
+      res.status(201).send({ comment: response[0] });
     })
     .catch(next);
 }
@@ -114,12 +111,31 @@ function getArticles(req, res, next) {
         res.status(200).send({ articles: responseThings[1] });
       })
       .catch(next);
-  } else
+  } else if (order) {
+    Promise.all([
+      checkOrder(order),
+      fetchArticles(sort_by, order, author, topic)
+    ])
+      .then(responseThings => {
+        res.status(200).send({ articles: responseThings[1] });
+      })
+      .catch(next);
+  } else if (sort_by) {
+    Promise.all([
+      checkColumnExists(sort_by),
+      fetchArticles(sort_by, order, author, topic)
+    ])
+      .then(responseThings => {
+        res.status(200).send({ articles: responseThings[1] });
+      })
+      .catch(next);
+  } else {
     fetchArticles(sort_by, order, author, topic)
       .then(response => {
         res.status(200).send({ articles: response });
       })
       .catch(next);
+  }
 }
 
 function patchComment(req, res, next) {
@@ -130,7 +146,7 @@ function patchComment(req, res, next) {
     amendComment(comment_id, inc_votes)
   ])
     .then(responseThings => {
-      res.status(200).send({ comment: responseThings[1] });
+      res.status(200).send({ comment: responseThings[1][0] });
     })
     .catch(next);
 }
@@ -147,9 +163,28 @@ function deleteComment(req, res, next) {
     .catch(next);
 }
 
+function getEndpoints(req, res, next) {
+  res
+    .status(200)
+    .send({
+      endpoints: {
+        "/api": "GET",
+        "/api/topics": "GET",
+        "/api/users/:username": "GET",
+        "/api/articles/:article_id": "GET",
+        "/api/articles/:article_id": "PATCH",
+        "/api/articles/:article_id/comments": "POST",
+        "/api/articles/:article_id/comments": "GET",
+        "/api/articles": "GET",
+        "api/comments/:comment_id": "PATCH",
+        "api/comments/:comment_id": "DELETE"
+      }
+    })
+    .catch(next);
+}
+
 module.exports = {
   getAllTopics,
-  send405Error,
   getUser,
   getArticle,
   patchArticle,
@@ -157,5 +192,6 @@ module.exports = {
   getComments,
   getArticles,
   patchComment,
-  deleteComment
+  deleteComment,
+  getEndpoints
 };

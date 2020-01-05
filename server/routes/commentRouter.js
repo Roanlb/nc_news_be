@@ -1,9 +1,6 @@
 const commentRouter = require("express").Router();
-const {
-  send405Error,
-  patchComment,
-  deleteComment
-} = require("../controllers/controllers");
+const { patchComment, deleteComment } = require("../controllers/controllers");
+const { send405Error } = require("../errorHandlers/errorHandlers");
 
 commentRouter
   .route("/:comment_id")
