@@ -74,51 +74,25 @@ function getArticles(req, res, next) {
   const order = req.query.order;
   const author = req.query.author;
   const topic = req.query.topic;
-  const id = req.params;
 
+  const getArticlesPromises = [fetchArticles(sort_by, order, author, topic)];
   if (author) {
-    Promise.all([
-      checkUserExists(author),
-      fetchArticles(sort_by, order, author, topic)
-    ])
-      .then(responseThings => {
-        res.status(200).send({ articles: responseThings[1] });
-      })
-      .catch(next);
-  } else if (topic) {
-    Promise.all([
-      checkTopicExists(topic),
-      fetchArticles(sort_by, order, author, topic)
-    ])
-      .then(responseThings => {
-        res.status(200).send({ articles: responseThings[1] });
-      })
-      .catch(next);
-  } else if (order) {
-    Promise.all([
-      checkOrder(order),
-      fetchArticles(sort_by, order, author, topic)
-    ])
-      .then(responseThings => {
-        res.status(200).send({ articles: responseThings[1] });
-      })
-      .catch(next);
-  } else if (sort_by) {
-    Promise.all([
-      checkColumnExists(sort_by),
-      fetchArticles(sort_by, order, author, topic)
-    ])
-      .then(responseThings => {
-        res.status(200).send({ articles: responseThings[1] });
-      })
-      .catch(next);
-  } else {
-    fetchArticles(sort_by, order, author, topic)
-      .then(response => {
-        res.status(200).send({ articles: response });
-      })
-      .catch(next);
+    getArticlesPromises.push(checkUserExists(author));
   }
+  if (topic) {
+    getArticlesPromises.push(checkTopicExists(topic));
+  }
+  if (sort_by) {
+    getArticlesPromises.push(checkColumnExists(sort_by));
+  }
+  if (order) {
+    getArticlesPromises.push(checkOrder(order));
+  }
+  Promise.all(getArticlesPromises)
+    .then(responseThings => {
+      res.status(200).send({ articles: responseThings[0] });
+    })
+    .catch(next);
 }
 
 module.exports = {

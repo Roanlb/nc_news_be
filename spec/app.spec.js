@@ -254,6 +254,49 @@ describe("/api", () => {
             });
         });
       });
+      describe("combined queries", () => {
+        it("works with multiple queries", () => {
+          return request
+            .get(
+              "/api/articles?order=asc&sort_by=votes&topic=mitch&author=butter_bridge"
+            )
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles).to.deep.equal([
+                {
+                  article_id: 9,
+                  title: "They're not exactly dogs, are they?",
+                  body: "Well? Think about it.",
+                  votes: 0,
+                  topic: "mitch",
+                  author: "butter_bridge",
+                  created_at: "1986-11-23T12:21:54.171Z",
+                  comment_count: "2"
+                },
+                {
+                  article_id: 12,
+                  title: "Moustache",
+                  body: "Have you seen the size of that thing?",
+                  votes: 0,
+                  topic: "mitch",
+                  author: "butter_bridge",
+                  created_at: "1974-11-26T12:21:54.171Z",
+                  comment_count: "0"
+                },
+                {
+                  article_id: 1,
+                  title: "Living in the shadow of a great man",
+                  body: "I find this existence challenging",
+                  votes: 100,
+                  topic: "mitch",
+                  author: "butter_bridge",
+                  created_at: "2018-11-15T12:21:54.171Z",
+                  comment_count: "13"
+                }
+              ]);
+            });
+        });
+      });
     });
     describe("invalid methods", () => {
       it("returns method not allowed when given an invalid method request", () => {

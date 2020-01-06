@@ -17,4 +17,4 @@ The tests written in the server spec file test each available endpoint and metho
 
 ### Heroku host
 
-This api is hosted on Heroku at https://roanncnewsserver.herokuapp.com/
+This api is hosted on Heroku at https://roanncnewsserver.herokuapp.com/api
