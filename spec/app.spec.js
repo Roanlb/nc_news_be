@@ -61,8 +61,8 @@ describe("/api", () => {
         return request
           .get("/api/topics")
           .expect(200)
-          .then(response => {
-            expect(response.body.topics).to.deep.equal([
+          .then(({ body: { topics } }) => {
+            expect(topics).to.deep.equal([
               {
                 description: "The man, the Mitch, the legend",
                 slug: "mitch"
@@ -89,6 +89,7 @@ describe("/api", () => {
               expect(response.body.msg).to.equal("Method not allowed");
             });
         });
+        return Promise.all(methodPromises);
       });
     });
   });
@@ -543,6 +544,22 @@ describe("/api", () => {
                   body: "I am 100% sure that we're not completely sure."
                 }
               ]);
+            });
+        });
+        it("responds with 404 when given a valid but nonexistent id", () => {
+          return request
+            .get("/api/articles/999/comments")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Article does not exist");
+            });
+        });
+        it("responds with 400 when given an invalid id", () => {
+          return request
+            .get("/api/articles/article2/comments")
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("Invalid id");
             });
         });
         it("works with a sort by query", () => {

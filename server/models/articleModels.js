@@ -86,8 +86,6 @@ function fetchArticles(sort_by, order, author, topic) {
     .count({ comment_count: "comments.comment_id" })
     .modify(query => {
       if (author) query.where("articles.author", "=", author);
-    })
-    .modify(query => {
       if (topic) query.where("articles.topic", "=", topic);
     })
     .leftJoin("comments", "articles.article_id", "comments.article_id")

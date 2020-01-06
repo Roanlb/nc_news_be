@@ -51,16 +51,20 @@ function getComments(req, res, next) {
   if (sort_by) {
     Promise.all([
       checkColumnExists(sort_by),
+      checkParentArticleExists(article_id),
+      fetchComments(article_id, sort_by, order)
+    ])
+      .then(responseThings => {
+        res.status(200).send({ comments: responseThings[2] });
+      })
+      .catch(next);
+  } else
+    Promise.all([
+      checkParentArticleExists(article_id),
       fetchComments(article_id, sort_by, order)
     ])
       .then(responseThings => {
         res.status(200).send({ comments: responseThings[1] });
-      })
-      .catch(next);
-  } else
-    fetchComments(article_id, sort_by, order)
-      .then(commentsResponse => {
-        res.status(200).send({ comments: commentsResponse });
       })
       .catch(next);
 }
@@ -70,6 +74,7 @@ function getArticles(req, res, next) {
   const order = req.query.order;
   const author = req.query.author;
   const topic = req.query.topic;
+  const id = req.params;
 
   if (author) {
     Promise.all([
