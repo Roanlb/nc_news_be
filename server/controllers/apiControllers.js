@@ -3,16 +3,16 @@ function getEndpoints(req, res, next) {
     .status(200)
     .send({
       endpoints: {
-        "/api": "GET",
-        "/api/topics": "GET",
-        "/api/users/:username": "GET",
-        "/api/articles/:article_id": "GET",
-        "/api/articles/:article_id": "PATCH",
-        "/api/articles/:article_id/comments": "POST",
-        "/api/articles/:article_id/comments": "GET",
-        "/api/articles": "GET",
-        "api/comments/:comment_id": "PATCH",
-        "api/comments/:comment_id": "DELETE"
+        '/api': 'GET',
+        '/api/topics': 'GET',
+        '/api/users/:username': 'GET',
+        '/api/articles/:article_id (1)': 'GET',
+        '/api/articles/:article_id (2)': 'PATCH',
+        '/api/articles/:article_id/comments (1)': 'POST',
+        '/api/articles/:article_id/comments (2)': 'GET',
+        '/api/articles': 'GET',
+        'api/comments/:comment_id (1)': 'PATCH',
+        'api/comments/:comment_id (2)': 'DELETE'
       }
     })
     .catch(next);
