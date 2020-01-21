@@ -61,7 +61,7 @@ describe('/api', () => {
                     topic: 'football',
                     author: 'jessjelly',
                     created_at: '2017-04-01T10:54:48.304Z',
-                    comment_count: '5'
+                    comment_count: 5
                   }
                 }
               },
@@ -80,7 +80,7 @@ describe('/api', () => {
                     topic: 'football',
                     author: 'jessjelly',
                     created_at: '2017-04-01T10:54:48.304Z',
-                    comment_count: '5'
+                    comment_count: 5
                   }
                 }
               },
@@ -289,8 +289,8 @@ describe('/api', () => {
           .get('/api/articles')
           .expect(200)
           .then(response => {
-            expect(response.body.articles[0].comment_count).to.equal('13');
-            expect(response.body.articles[1].comment_count).to.equal('0');
+            expect(response.body.articles[0].comment_count).to.equal(13);
+            expect(response.body.articles[1].comment_count).to.equal(0);
           });
       });
       describe('author queries', () => {
@@ -334,7 +334,7 @@ describe('/api', () => {
         });
       });
       describe('sort by queries', () => {
-        it('returns the articles by specified sort by column', () => {
+        it('returns the articles by votes', () => {
           return request
             .get('/api/articles?sort_by=votes')
             .expect(200)
@@ -342,6 +342,26 @@ describe('/api', () => {
               expect(response.body.articles).to.be.sortedBy('votes', {
                 descending: true
               });
+            });
+        });
+        it('returns the articles by author', () => {
+          return request
+            .get('/api/articles?sort_by=author')
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles).to.be.sortedBy('author', {
+                descending: true
+              });
+            });
+        });
+        it('returns the articles by comment count', () => {
+          return request
+            .get('/api/articles?sort_by=comment_count')
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles).to.be.descendingBy(
+                'comment_count'
+              );
             });
         });
         it('returns 400 if given a nonexistent sort by column', () => {
@@ -400,7 +420,7 @@ describe('/api', () => {
                   topic: 'mitch',
                   author: 'butter_bridge',
                   created_at: '1986-11-23T12:21:54.171Z',
-                  comment_count: '2'
+                  comment_count: 2
                 },
                 {
                   article_id: 12,
@@ -410,7 +430,7 @@ describe('/api', () => {
                   topic: 'mitch',
                   author: 'butter_bridge',
                   created_at: '1974-11-26T12:21:54.171Z',
-                  comment_count: '0'
+                  comment_count: 0
                 },
                 {
                   article_id: 1,
@@ -420,7 +440,7 @@ describe('/api', () => {
                   topic: 'mitch',
                   author: 'butter_bridge',
                   created_at: '2018-11-15T12:21:54.171Z',
-                  comment_count: '13'
+                  comment_count: 13
                 }
               ]);
             });
@@ -461,7 +481,7 @@ describe('/api', () => {
             .get('/api/articles/1')
             .expect(200)
             .then(response => {
-              expect(response.body.article.comment_count).to.equal('13');
+              expect(response.body.article.comment_count).to.equal(13);
             });
         });
         it('returns a votes key which defaults to 0', () => {
@@ -477,7 +497,7 @@ describe('/api', () => {
             .get('/api/articles/2')
             .expect(200)
             .then(response => {
-              expect(response.body.article.comment_count).to.equal('0');
+              expect(response.body.article.comment_count).to.equal(0);
             });
         });
         it('returns 400 with an appropriate message when given an invalid article id', () => {

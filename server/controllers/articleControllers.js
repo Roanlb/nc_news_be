@@ -9,7 +9,7 @@ const {
   checkTopicExists,
   checkColumnExists,
   checkOrder
-} = require("../models/articleModels");
+} = require('../models/articleModels');
 
 function getArticle(req, res, next) {
   const { article_id } = req.params;
@@ -37,8 +37,8 @@ function postComment(req, res, next) {
   const article_id = req.params.article_id;
   const comment = req.body;
   prepostComment(article_id, comment)
-    .then(response => {
-      res.status(201).send({ comment: response[0] });
+    .then(([response]) => {
+      res.status(201).send({ comment: response });
     })
     .catch(next);
 }

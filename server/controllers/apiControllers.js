@@ -42,7 +42,7 @@ function getEndpoints(req, res, next) {
               topic: 'football',
               author: 'jessjelly',
               created_at: '2017-04-01T10:54:48.304Z',
-              comment_count: '5'
+              comment_count: 5
             }
           }
         },
@@ -61,7 +61,7 @@ function getEndpoints(req, res, next) {
               topic: 'football',
               author: 'jessjelly',
               created_at: '2017-04-01T10:54:48.304Z',
-              comment_count: '5'
+              comment_count: 5
             }
           }
         },

@@ -1,5 +1,5 @@
 function send405Error(req, res, next) {
-  res.status(405).send({ msg: "Method not allowed" });
+  res.status(405).send({ msg: 'Method not allowed' });
 }
 
 function sendMalformedBodyError(err, req, res, next) {
@@ -11,7 +11,7 @@ function sendOrderError(err, req, res, next) {
 }
 
 function sendSortByError(err, req, res, next) {
-  res.status(400).send({ msg: "Sort by column does not exist" });
+  res.status(400).send({ msg: 'Sort by column does not exist' });
 }
 
 function sendVertasileIdError(err, req, res, next) {
@@ -19,11 +19,11 @@ function sendVertasileIdError(err, req, res, next) {
 }
 
 function sendInvalidIdError(err, req, res, next) {
-  res.status(400).send({ msg: "Invalid id" });
+  res.status(400).send({ msg: 'Invalid id' });
 }
 
 function sendNotFoundError(err, req, res, next) {
-  res.status(404).send({ msg: "Not found" });
+  res.status(404).send({ msg: 'Not found' });
 }
 
 module.exports = {
