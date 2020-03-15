@@ -1,6 +1,6 @@
 ## Roan NC News Server
 
-This is an application programming environment for serving news items, and my backend project for Northcoders.
+This is a REST application programming interface for serving news items, and my backend project for Northcoders.
 
 ### Prerequisites
 
