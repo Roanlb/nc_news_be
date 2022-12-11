@@ -29,7 +29,7 @@
   "homepage": "https://github.com/Roanlb/nc_news_be.git#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "kind-of": "^6.0.3",
     "knex": "^0.20.4",
     "minimist": "^1.2.5",
